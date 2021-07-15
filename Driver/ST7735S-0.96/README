@@ -1,1 +1,5 @@
 兼容性驱动
+2021-7-15:
+1.修复logo在16bit模式下的兼容
+2.修复showpicture的color及增加图片指针
+3.修复setaddress不同厂家offset的兼容问题
