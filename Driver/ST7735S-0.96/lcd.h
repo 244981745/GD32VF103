@@ -6,6 +6,10 @@
 #include "gd32vf103_gpio.h"
 #include <gd32vf103_spi.h>
 
+#define NEWLCD  1
+#define         MODE18  1
+//#define       MODE16  1
+
 #define USE_HORIZONTAL 2  //Set horizontal or vertical screen display 0 or 1 for vertical screen 2 or 3 for horizontal screen
 #define HAS_BLK_CNTL    0
 
@@ -82,7 +86,7 @@ typedef unsigned long u32;
 #define OLED_CMD  0	//Write command
 #define OLED_DATA 1	//Write data
 
-extern  u16 BACK_COLOR;   //Background color
+extern  u32 BACK_COLOR;   //Background color
 extern unsigned char image[12800];
 
 void LCD_Writ_Bus(u8 dat);
@@ -99,15 +103,16 @@ void LCD_Fill(u16 xsta,u16 ysta,u16 xend,u16 yend,u16 color);
 void LCD_DrawLine(u16 x1,u16 y1,u16 x2,u16 y2,u16 color);
 void LCD_DrawRectangle(u16 x1, u16 y1, u16 x2, u16 y2,u16 color);
 void Draw_Circle(u16 x0,u16 y0,u8 r,u16 color);
-void LCD_ShowChar(u16 x,u16 y,u8 num,u8 mode,u16 color);
-void LCD_ShowString(u16 x,u16 y,const u8 *p,u16 color);
+void LCD_ShowChar(u16 x,u16 y,u8 num,u8 mode,u32 color);
+void LCD_ShowString(u16 x,u16 y,const u8 *p,u32 color);
 u32 mypow(u8 m,u8 n);
 void LCD_ShowNum(u16 x,u16 y,u16 num,u8 len,u16 color);
 void LCD_ShowNum1(u16 x,u16 y,float num,u8 len,u16 color);
-void LCD_ShowPicture(u16 x1,u16 y1,u16 x2,u16 y2);
+void LCD_ShowPicture(u16 x1,u16 y1,u16 x2,u16 y2,unsigned char *source);
 void LCD_ShowLogo(void);
 void LCD_ShowLogo0(void);
 
+#if     MODE16
 //Brush color
 #define WHITE         	 0xFFFF
 #define BLACK         	 0x0000	  
@@ -135,8 +140,27 @@ void LCD_ShowLogo0(void);
 
 #define LGRAYBLUE        0XA651 //Light gray blue (middle layer color)
 #define LBBLUE           0X2B12 //Light brown blue (inverted color of selected item)
+#endif
 
+#if     MODE18
+//Brush color
+#define WHITE           0xFFFFFF
+#define BLACK           0x000000
 
+#define BLUE            0x0000FF
+#define BRED            0xFF00FF
+#define GRED            0x00FF00
+#define GBLUE           0X00FFFF
+
+#define RED             0xFF0000
+#define MAGENTA         0xFF00FF
+#define GREEN           0x00FF00
+#define CYAN            0xEFFFFF
+#define YELLOW          0xF9F900
+
+//The above three colors are the colors of PANEL
+ 
+#endif
 					  		 
 #endif  
 	 

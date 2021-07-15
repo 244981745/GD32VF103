@@ -1,10 +1,9 @@
 #include "lcd.h"
 #include "oledfont.h"
 #include "bmp.h"
-//
-#define NEWLCD  1
 
-u16 BACK_COLOR;   //Background color
+
+u32 BACK_COLOR;   //Background color
 
 /******************************************************************************
        Function description: LCD serial data write function
@@ -112,17 +111,21 @@ void LCD_Address_Set(u16 x1,u16 y1,u16 x2,u16 y2)
 		LCD_WR_REG(0x2a);//Column address settings
 #ifndef NEWLCD
 		LCD_WR_DATA(x1+1);
+		LCD_WR_DATA(x2+1);
 #else
                 LCD_WR_DATA(x1);
+		LCD_WR_DATA(x2);
 #endif
-		LCD_WR_DATA(x2+1);
+
 		LCD_WR_REG(0x2b);//Row address setting
 #ifndef NEWLCD
 		LCD_WR_DATA(y1+26);
+		LCD_WR_DATA(y2+26);
 #else
                 LCD_WR_DATA(y1+24);
+		LCD_WR_DATA(y2+24);
 #endif
-		LCD_WR_DATA(y2+26);
+
 		LCD_WR_REG(0x2c);//Memory write
 	}
 	else
@@ -247,44 +250,39 @@ void Lcd_Init(void)
 
 	LCD_WR_REG(0x11);	// turn off sleep mode
 	delay_1ms(100);
-
-#ifndef NEWLCD
-	LCD_WR_REG(0x21);	// display inversion mode
+#ifdef NEWLCD
+	LCD_WR_REG(0x20);	// display inversion mode
 #else
-        LCD_WR_REG(0x20);	//  display inversion mode
+        LCD_WR_REG(0x21);	// display inversion mode
 #endif
-        LCD_WR_REG(0x13);	// 
-
-        LCD_WR_REG(0x35);	// 
-
 	LCD_WR_REG(0xB1);	// Set the frame frequency of the full colors normal mode
 						// Frame rate=fosc/((RTNA x 2 + 40) x (LINE + FPA + BPA +2))
 						// fosc = 850kHz
 	LCD_WR_DATA8(0x05);	// RTNA
-	LCD_WR_DATA8(0x3C);	// FPA  3A
-	LCD_WR_DATA8(0x3C);	// BPA  3A
+	LCD_WR_DATA8(0x3A);	// FPA
+	LCD_WR_DATA8(0x3A);	// BPA
 
 	LCD_WR_REG(0xB2);	// Set the frame frequency of the Idle mode
 						// Frame rate=fosc/((RTNB x 2 + 40) x (LINE + FPB + BPB +2))
 						// fosc = 850kHz
 	LCD_WR_DATA8(0x05);	// RTNB
-	LCD_WR_DATA8(0x3C);	// FPB 3A
-	LCD_WR_DATA8(0x3C);	// BPB  3A
+	LCD_WR_DATA8(0x3A);	// FPB
+	LCD_WR_DATA8(0x3A);	// BPB
 
 	LCD_WR_REG(0xB3);	// Set the frame frequency of the Partial mode/ full colors
 	LCD_WR_DATA8(0x05);  
-	LCD_WR_DATA8(0x3C);     //3A
-	LCD_WR_DATA8(0x3C);
+	LCD_WR_DATA8(0x3A);
+	LCD_WR_DATA8(0x3A);
 	LCD_WR_DATA8(0x05);
-	LCD_WR_DATA8(0x3C);
-	LCD_WR_DATA8(0x3C);
+	LCD_WR_DATA8(0x3A);
+	LCD_WR_DATA8(0x3A);
 
 	LCD_WR_REG(0xB4);
 	LCD_WR_DATA8(0x03);
 
 	LCD_WR_REG(0xC0);
-	LCD_WR_DATA8(0x0E);     //62
-	LCD_WR_DATA8(0x0E);     //02
+	LCD_WR_DATA8(0x62);
+	LCD_WR_DATA8(0x02);
 	LCD_WR_DATA8(0x04);
 
 	LCD_WR_REG(0xC1);
@@ -296,52 +294,16 @@ void Lcd_Init(void)
 
 	LCD_WR_REG(0xC3);
 	LCD_WR_DATA8(0x8D);
-	LCD_WR_DATA8(0x2A);   //6A
+	LCD_WR_DATA8(0x6A);   
 
 	LCD_WR_REG(0xC4);
 	LCD_WR_DATA8(0x8D); 
 	LCD_WR_DATA8(0xEE); 
 
 	LCD_WR_REG(0xC5);  /*VCOM*/
-	LCD_WR_DATA8(0x04);    //0E
+	LCD_WR_DATA8(0x0E);    
 
 	LCD_WR_REG(0xE0);
-	LCD_WR_DATA8(0x05);
-	LCD_WR_DATA8(0x1A);
-	LCD_WR_DATA8(0x0B);
-	LCD_WR_DATA8(0x15);
-	LCD_WR_DATA8(0x3D);
-	LCD_WR_DATA8(0x38);
-	LCD_WR_DATA8(0x2E);
-	LCD_WR_DATA8(0x30);
-	LCD_WR_DATA8(0x2D);
-	LCD_WR_DATA8(0x28);
-	LCD_WR_DATA8(0x30);
-	LCD_WR_DATA8(0x3B);
-	LCD_WR_DATA8(0x00);
-	LCD_WR_DATA8(0x01);
-	LCD_WR_DATA8(0x02);
-	LCD_WR_DATA8(0x10);
-
-        LCD_WR_REG(0xE1);
-	LCD_WR_DATA8(0x05);
-	LCD_WR_DATA8(0x1A);
-	LCD_WR_DATA8(0x0B);
-	LCD_WR_DATA8(0x15);
-	LCD_WR_DATA8(0x36);
-	LCD_WR_DATA8(0x2E);
-	LCD_WR_DATA8(0x28);
-	LCD_WR_DATA8(0x2B);
-	LCD_WR_DATA8(0x2B);
-	LCD_WR_DATA8(0x28);
-	LCD_WR_DATA8(0x30);
-	LCD_WR_DATA8(0x3B);
-	LCD_WR_DATA8(0x00);
-	LCD_WR_DATA8(0x01);
-	LCD_WR_DATA8(0x02);
-	LCD_WR_DATA8(0x10);
-/*
-        LCD_WR_REG(0xE0);
 	LCD_WR_DATA8(0x10);
 	LCD_WR_DATA8(0x0E);
 	LCD_WR_DATA8(0x02);
@@ -376,17 +338,19 @@ void Lcd_Init(void)
 	LCD_WR_DATA8(0x0D);
 	LCD_WR_DATA8(0x0E);
 	LCD_WR_DATA8(0x10);
-*/
+
 	LCD_WR_REG(0x3A);	// define the format of RGB picture data
-	//LCD_WR_DATA8(0x05);	// 16-bit/pixel
-        LCD_WR_DATA8(0x06);	// 18-bit/pixel
+#ifdef  MODE16
+	LCD_WR_DATA8(0x05);	// 16-bit/pixel
+#elif   MODE18
+	LCD_WR_DATA8(0x06);	// 18-bit/pixel
+#endif
 
 	LCD_WR_REG(0x36);
-        LCD_WR_DATA8(0xA8);
-	//if(USE_HORIZONTAL==0)LCD_WR_DATA8(0x08);
-	//else if(USE_HORIZONTAL==1)LCD_WR_DATA8(0xC8);
-	//else if(USE_HORIZONTAL==2)LCD_WR_DATA8(0x78);
-	//else LCD_WR_DATA8(0xA8);
+	if(USE_HORIZONTAL==0)LCD_WR_DATA8(0x08);
+	else if(USE_HORIZONTAL==1)LCD_WR_DATA8(0xC8);
+	else if(USE_HORIZONTAL==2)LCD_WR_DATA8(0x78);
+	else LCD_WR_DATA8(0xA8);
 
 	LCD_WR_REG(0x29);	// Display On
 }
@@ -404,7 +368,13 @@ void LCD_Clear(u16 Color)
 	  {
               for (j=0;j<LCD_H;j++)
                       {
-                              LCD_WR_DATA(Color);
+#ifdef  MODE16
+                                LCD_WR_DATA(Color);
+#else
+                                LCD_WR_DATA8(Color>>16&0xff);
+                                LCD_WR_DATA8(Color>>8&0xff);
+                                LCD_WR_DATA8(Color&0xff);
+#endif
                       }
 	  }
 }
@@ -417,6 +387,7 @@ void LCD_Clear(u16 Color)
                    size font size
        Return value: None
 ******************************************************************************/
+/*
 void LCD_ShowChinese(u16 x,u16 y,u8 index,u8 size,u16 color)	
 {  
 	u8 i,j;
@@ -425,7 +396,7 @@ void LCD_ShowChinese(u16 x,u16 y,u8 index,u8 size,u16 color)
 	if(size==32){temp=Hzk32;}
   LCD_Address_Set(x,y,x+size-1,y+size-1); //设置一个汉字的区域
   size1=size*size/8;//一个汉字所占的字节
-	temp+=index*size1;//写入的起始位�	for(j=0;j<size1;j++)
+	temp+=index*size1;//写入的起始位
 	{
 		for(i=0;i<8;i++)
 		{
@@ -435,14 +406,14 @@ void LCD_ShowChinese(u16 x,u16 y,u8 index,u8 size,u16 color)
 			}
 			else
 			{
-				LCD_WR_DATA(BACK_COLOR);//不点�			}
+				LCD_WR_DATA(BACK_COLOR);//不点
                         }
 		temp++;
                 }
         }
 }
 
-
+*/
 
 
 
@@ -504,12 +475,12 @@ void LCD_DrawLine(u16 x1,u16 y1,u16 x2,u16 y2,u16 color)
 	uRow=x1;//画线起点坐标
 	uCol=y1;
 	if(delta_x>0)incx=1; //设置单步方向 
-	else if (delta_x==0)incx=0;//垂直�
+	else if (delta_x==0)incx=0;//垂直��
 	else {incx=-1;delta_x=-delta_x;}
 	if(delta_y>0)incy=1;
-	else if (delta_y==0)incy=0;//水平�
+	else if (delta_y==0)incy=0;//水平��
 	else {incy=-1;delta_y=-delta_x;}
-	if(delta_x>delta_y)distance=delta_x; //选取基本增量坐标�
+	if(delta_x>delta_y)distance=delta_x; //选取基本增量坐标��
 	else distance=delta_y;
 	for(t=0;t<distance+1;t++)
 	{
@@ -582,7 +553,7 @@ void Draw_Circle(u16 x0,u16 y0,u8 r,u16 color)
                    mode 1 superimposed mode 0 non-superimposed mode
        Return value: None
 ******************************************************************************/
-void LCD_ShowChar(u16 x,u16 y,u8 num,u8 mode,u16 color)
+void LCD_ShowChar(u16 x,u16 y,u8 num,u8 mode,u32 color)
 {
     u8 temp;
     u8 pos,t;
@@ -595,15 +566,29 @@ void LCD_ShowChar(u16 x,u16 y,u8 num,u8 mode,u16 color)
 		for(pos=0;pos<16;pos++)
 		{ 
 			temp=asc2_1608[(u16)num*16+pos];		 //Call 1608 font
-			for(t=0;t<8;t++)
-		    {                 
-		        if(temp&0x01)LCD_WR_DATA(color);
-				else LCD_WR_DATA(BACK_COLOR);
-				temp>>=1;
-				x++;
-		    }
-			x=x0;
-			y++;
+                        for(t=0;t<8;t++)
+                        {
+#ifdef MODE16
+                                if(temp&0x01)LCD_WR_DATA(color);
+                                else LCD_WR_DATA(BACK_COLOR);
+#elif MODE18
+                                if((temp>>t)&0x1)
+                                {
+                                        LCD_WR_DATA8(color>>16&0xff);
+                                        LCD_WR_DATA8(color>>8&0xff);
+                                        LCD_WR_DATA8(color&0xff);
+                                }
+                                else
+                                {
+                                        LCD_WR_DATA8(BACK_COLOR>>16&0xff);
+                                        LCD_WR_DATA8(BACK_COLOR>>8&0xff);
+                                        LCD_WR_DATA8(BACK_COLOR&0xff);
+                                }
+#endif
+                                x++;
+                      }
+                        x=x0;
+                        y++;
 		}	
 	}else//overlapping mode
 	{
@@ -626,7 +611,7 @@ void LCD_ShowChar(u16 x,u16 y,u8 num,u8 mode,u16 color)
                    *p string start address
        Return value: None
 ******************************************************************************/
-void LCD_ShowString(u16 x,u16 y,const u8 *p,u16 color)
+void LCD_ShowString(u16 x,u16 y,const u8 *p,u32 color)
 {         
     while(*p!='\0')
     {       
@@ -635,7 +620,7 @@ void LCD_ShowString(u16 x,u16 y,const u8 *p,u16 color)
         LCD_ShowChar(x,y,*p,0,color);
         x+=8;
         p++;
-    }  
+    }
 }
 
 
@@ -644,6 +629,7 @@ void LCD_ShowString(u16 x,u16 y,const u8 *p,u16 color)
        Entry data: base m, n exponent
        Return value: None
 ******************************************************************************/
+//======================
 u32 mypow(u8 m,u8 n)
 {
 	u32 result=1;	 
@@ -659,6 +645,7 @@ u32 mypow(u8 m,u8 n)
                    len number of digits to display
        Return value: None
 ******************************************************************************/
+//==============================
 void LCD_ShowNum(u16 x,u16 y,u16 num,u8 len,u16 color)
 {         	
 	u8 t,temp;
@@ -687,6 +674,7 @@ void LCD_ShowNum(u16 x,u16 y,u16 num,u8 len,u16 color)
                    len number of digits to display
        Return value: None
 ******************************************************************************/
+//================================
 void LCD_ShowNum1(u16 x,u16 y,float num,u8 len,u16 color)
 {         	
 	u8 t,temp;
@@ -712,15 +700,21 @@ void LCD_ShowNum1(u16 x,u16 y,float num,u8 len,u16 color)
        Entry data: x, y starting point coordinates
        Return value: None
 ******************************************************************************/
-void LCD_ShowPicture(u16 x1,u16 y1,u16 x2,u16 y2)
+void LCD_ShowPicture(u16 x1,u16 y1,u16 x2,u16 y2,unsigned char *source)
 {
 	int i;
 	LCD_Address_Set(x1,y1,x2,y2);
 	for(i=0;i<12800;i++)
-	{ 	
-		// LCD_WR_DATA8(image[i*2+1]);
-		LCD_WR_DATA8(image[i]);
-	}			
+	{
+#if     MODE18
+		LCD_WR_DATA8(source[i*3+0]);
+                LCD_WR_DATA8(source[i*3+1]);
+                LCD_WR_DATA8(source[i*3+2]);
+#else
+                LCD_WR_DATA8(source[i*2+0]);
+                LCD_WR_DATA8(source[i*2+1]);
+#endif
+	}
 }
 
 
@@ -728,12 +722,13 @@ void LCD_ShowPicture(u16 x1,u16 y1,u16 x2,u16 y2)
 void LCD_ShowLogo(void)
 {
 	int i;
-	//LCD_Address_Set(0,0,159,75);
-	//for(i=0;i<25600;i++)
         LCD_Address_Set(0,0,159,79);
+#if     MODE18
         for(i=0;i<38400;i++)
+#else
+        for(i=0;i<25600;i++)
+#endif
 	{
-		//LCD_WR_DATA8(logo_bmp[i]);
                 LCD_WR_DATA8(gImage_1[i]);
 	}
 }
@@ -742,12 +737,13 @@ void LCD_ShowLogo(void)
 void LCD_ShowLogo0(void)
 {
 	int i;
-	//LCD_Address_Set(0,0,159,75);
-	//for(i=0;i<25600;i++)
         LCD_Address_Set(0,0,159,79);
+#if     MODE18
         for(i=0;i<38400;i++)
+#else
+        for(i=0;i<25600;i++)
+#endif
 	{
-		//LCD_WR_DATA8(logo_bmp[i]);
                 LCD_WR_DATA8(gImage_2[i]);
 	}
 }
