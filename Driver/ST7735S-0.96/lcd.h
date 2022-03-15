@@ -6,9 +6,34 @@
 #include "gd32vf103_gpio.h"
 #include <gd32vf103_spi.h>
 
-#define NEWLCD  1
-#define         MODE18  1
-//#define       MODE16  1
+/* =================== color =================== */
+#define WHITE           0xFFFFFF
+#define BLACK           0x000000
+
+#define RED             0xFF0000
+#define GREEN           0x00FF00
+#define BLUE            0x0000FF
+
+#define GRAY            0xC0COC0
+#define BROWN           0xA52A2A
+
+#define CYAN            0x00FFFF
+#define YELLOW          0xFFFF00
+#define MAGENTA         0xFF00FF
+
+#define DARKBLUE      	 0x000080	//navy blue
+#define LIGHTBLUE      	 0xADD8E6	//light blue 
+
+#define DARKGREEN        0x006400
+#define LIGHTGREEN     	 0X90EE90       //light green
+
+#define LIGHTGRAY 	 0xD3D3D3       //Light gray
+#define LIGHTCYAN        0xE0FFFF
+#define LIGHTYELLOW      0xFFFFE0
+
+/* =================== config =================== */
+#define NEWLCD      1
+#define MODE_16_18  1   // 0:16bit mode   1:18bit mode
 
 #define USE_HORIZONTAL 2  //Set horizontal or vertical screen display 0 or 1 for vertical screen 2 or 3 for horizontal screen
 #define HAS_BLK_CNTL    0
@@ -21,9 +46,9 @@
 #define LCD_H 80
 #endif
 
-typedef unsigned char u8;
-typedef unsigned int u16;
-typedef unsigned long u32;    			
+typedef unsigned char   u8;
+typedef unsigned int    u16;
+typedef unsigned long   u32;
 
 
 // #define LED_ON gpio_bit_reset(GPIOC,GPIO_PIN_13)
@@ -40,12 +65,6 @@ typedef unsigned long u32;
 
 //-----------------OLED端口定义---------------- 
 #if SPI0_CFG == 1
-#define OLED_SCLK_Clr() 
-#define OLED_SCLK_Set() 
-
-#define OLED_SDIN_Clr()
-#define OLED_SDIN_Set()
-
 #define OLED_CS_Clr() gpio_bit_reset(GPIOB,GPIO_PIN_2)     //CS PB2
 #define OLED_CS_Set() gpio_bit_set(GPIOB,GPIO_PIN_2)
 #elif SPI0_CFG == 2
@@ -86,82 +105,25 @@ typedef unsigned long u32;
 #define OLED_CMD  0	//Write command
 #define OLED_DATA 1	//Write data
 
-extern  u32 BACK_COLOR;   //Background color
+
+extern u32 COLOR;
+extern u32 BACK_COLOR;
 extern unsigned char image[12800];
 
+/* =================== function =================== */
 void LCD_Writ_Bus(u8 dat);
 void LCD_WR_DATA8(u8 dat);
 void LCD_WR_DATA(u16 dat);
 void LCD_WR_REG(u8 dat);
 void LCD_Address_Set(u16 x1,u16 y1,u16 x2,u16 y2);
 void Lcd_Init(void);
-void LCD_Clear(u16 Color);
+void LCD_Clear(u32 Color);
+void LCD_WR_COLOR(u32 Color);
+
+#if 0
 void LCD_ShowChinese(u16 x,u16 y,u8 index,u8 size,u16 color);
-void LCD_DrawPoint(u16 x,u16 y,u16 color);
-void LCD_DrawPoint_big(u16 x,u16 y,u16 color);
-void LCD_Fill(u16 xsta,u16 ysta,u16 xend,u16 yend,u16 color);
-void LCD_DrawLine(u16 x1,u16 y1,u16 x2,u16 y2,u16 color);
-void LCD_DrawRectangle(u16 x1, u16 y1, u16 x2, u16 y2,u16 color);
-void Draw_Circle(u16 x0,u16 y0,u8 r,u16 color);
-void LCD_ShowChar(u16 x,u16 y,u8 num,u8 mode,u32 color);
-void LCD_ShowString(u16 x,u16 y,const u8 *p,u32 color);
-u32 mypow(u8 m,u8 n);
-void LCD_ShowNum(u16 x,u16 y,u16 num,u8 len,u16 color);
-void LCD_ShowNum1(u16 x,u16 y,float num,u8 len,u16 color);
-void LCD_ShowPicture(u16 x1,u16 y1,u16 x2,u16 y2,unsigned char *source);
-void LCD_ShowLogo(void);
-void LCD_ShowLogo0(void);
-
-#if     MODE16
-//Brush color
-#define WHITE         	 0xFFFF
-#define BLACK         	 0x0000	  
-#define BLUE           	 0x001F  
-#define BRED             0XF81F
-#define GRED 			 0XFFE0
-#define GBLUE			 0X07FF
-#define RED           	 0xF800
-#define MAGENTA       	 0xF81F
-#define GREEN         	 0x07E0
-#define CYAN          	 0x7FFF
-#define YELLOW        	 0xFFE0
-#define BROWN 			 0XBC40 //brown
-#define BRRED 			 0XFC07 //maroon
-#define GRAY  			 0X8430 //gray
-//GUI color
-
-#define DARKBLUE      	 0X01CF	//navy blue
-#define LIGHTBLUE      	 0X7D7C	//light blue 
-#define GRAYBLUE       	 0X5458 //gray blue
-//The above three colors are the colors of PANEL
- 
-#define LIGHTGREEN     	 0X841F //light green
-#define LGRAY 			     0XC618 //Light gray (PANNEL), form background color
-
-#define LGRAYBLUE        0XA651 //Light gray blue (middle layer color)
-#define LBBLUE           0X2B12 //Light brown blue (inverted color of selected item)
 #endif
-
-#if     MODE18
-//Brush color
-#define WHITE           0xFFFFFF
-#define BLACK           0x000000
-
-#define BLUE            0x0000FF
-#define BRED            0xFF00FF
-#define GRED            0x00FF00
-#define GBLUE           0X00FFFF
-
-#define RED             0xFF0000
-#define MAGENTA         0xFF00FF
-#define GREEN           0x00FF00
-#define CYAN            0xEFFFFF
-#define YELLOW          0xF9F900
-
-//The above three colors are the colors of PANEL
- 
-#endif
-					  		 
+  		 
 #endif  
 	 
 	 
